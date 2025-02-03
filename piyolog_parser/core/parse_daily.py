@@ -38,7 +38,7 @@ class ParserDaily(ParserBase):
 
         return blocks
 
-    def parse_tile_block(self, title_block: str) -> dict:
+    def parse_title_block(self, title_block: str) -> dict:
         """
         parse title block
         """
@@ -64,20 +64,22 @@ class ParserDaily(ParserBase):
             return {"name": name, "age": age}
         return {"name": name, "age": age}
 
-    def parse_timeline(self, timeline: list) -> list:
+    def parse_timeline(self, timeline: list, parsed_title_block: dict) -> list:
         """
         Parse timeline block
         """
         time_pattern = re.compile(r"^(\d{2}:\d{2})\s+([^\s]+)(?:\s+(.+))?")
         parsed_timeline = []
+        date = parsed_title_block["date"]
 
         for entry in timeline:
             match = time_pattern.match(entry)
             if match:
                 time = match.group(1)
+                datetime = f"{date} {time}"
                 event_name = match.group(2)
                 event_details = match.group(3) if match.group(3) else ""
-                parsed_timeline.append({"time": time, "event_name": event_name, "event_details": event_details})
+                parsed_timeline.append({"datetime": datetime, "event_name": event_name, "event_details": event_details})
 
         return parsed_timeline
 
@@ -86,9 +88,9 @@ class ParserDaily(ParserBase):
         parse daily lines
         """
         blocks = self.parse_block(lines)
-        title = self.parse_tile_block(blocks["title"])
+        title = self.parse_title_block(blocks["title"])
         name = self.parse_name_block(blocks["name"])
-        timeline = self.parse_timeline(blocks["timeline"])
+        timeline = self.parse_timeline(blocks["timeline"], title)
         return {"title": title, "name": name, "timeline": timeline}
 
 

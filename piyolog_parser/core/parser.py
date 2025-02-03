@@ -47,4 +47,4 @@ class PiyologParser:
 
 if __name__ == "__main__":
     parser = PiyologParser()
-    print(parser.parse("data/Piyolog_Hinano_202501.txt"))
+    print(parser.parse("data/Piyolog_Hinano_20250203_14.txt"))
