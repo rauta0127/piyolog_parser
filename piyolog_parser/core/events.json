@@ -1,0 +1,50 @@
+{
+    "母乳": {
+        "group": "drink",
+        "name_en": "breast_milk",
+        "unit": "ml"
+    },
+    "ミルク": {
+        "group": "drink",
+        "name_en": "milk",
+        "unit": "ml"
+    },
+    "寝る": {
+        "group": "sleep",
+        "name_en": "sleep",
+        "unit": "minutes"
+    },
+    "起きる": {
+        "group": "sleep",
+        "name_en": "wakeup",
+        "unit": "minutes"
+    },
+    "おしっこ": {
+        "group": "peepoo",
+        "name_en": "pee",
+        "unit": "count"
+    },
+    "うんち": {
+        "group": "peepoo",
+        "name_en": "poo",
+        "unit": "count"
+    },
+    "体温": {
+        "group": "other",
+        "name_en": "temperature"
+    },
+    "搾母乳": {
+        "group": "drink",
+        "name_en": "pump_breast_milk",
+        "unit": "ml"
+    },
+    "のみもの": {
+        "group": "drink",
+        "name_en": "drink",
+        "unit": "ml"
+    },
+    "お風呂": {
+        "group": "other",
+        "name_en": "bath"
+    }
+}

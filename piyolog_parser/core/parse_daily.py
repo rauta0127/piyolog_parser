@@ -1,4 +1,5 @@
 import re
+import pandas as pd
 from .parse_base import ParserBase
 
 
@@ -93,10 +94,20 @@ class ParserDaily(ParserBase):
         timeline = self.parse_timeline(blocks["timeline"], title)
         return {"title": title, "name": name, "timeline": timeline}
 
+    def convert_timeline_to_dataframe(self, data: dict) -> pd.DataFrame:
+        name = data["name"]["name"]
+        timeline_data = data["timeline"]
+        timeline_df = pd.DataFrame(timeline_data)
+        timeline_df["name"] = name
+        timeline_df = timeline_df[["name", "datetime", "event_name", "event_details"]]
+        return timeline_df
+
 
 if __name__ == "__main__":
     with open("data/Piyolog_Hinano_20250203_14.txt") as f:
         lines = f.readlines()
     parser = ParserDaily()
-    parsed = parser.parse(lines)
-    print(parsed)
+    parsed_data = parser.parse(lines)
+    print(parsed_data)
+    timeline_df = parser.convert_timeline_to_dataframe(parsed_data)
+    print(timeline_df)

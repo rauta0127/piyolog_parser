@@ -24,7 +24,7 @@ class PiyologParser:
             if daily_or_monthly == "daily":
                 parser = ParserDaily()
                 data = parser.parse(lines)
-                return {"status": "valid", "data": data}
+                return {"status": "valid", "daily_or_monthly": "daily", "data": data}
             if daily_or_monthly == "monthly":
                 parser = ParserMonthly()
                 daily_blocks = parser.split_daily_blocks(lines)
@@ -32,19 +32,31 @@ class PiyologParser:
                 parser = ParserDaily()
                 for daily_block in daily_blocks:
                     data.append(parser.parse(daily_block))
-                return {"status": "valid", "data": data}
+                return {"status": "valid", "daily_or_monthly": "monthly", "data": data}
 
-    # def parse_to_pandas(self, filepath: str) -> pd.DataFrame:
-    #     with open(self.path) as f:
-    #         lines = f.readlines()
-
-    #     df = pd.DataFrame(columns=["date", "time", "level", "message"])
-    #     for line in lines:
-    #         date, time, level, message = self._parse_line(line)
-    #         df = df.append({"date": date, "time": time, "level": level, "message": message}, ignore_index=True)
-    #     return df
+    def get_timeline_df(self, data, daily_or_monthly) -> pd.DataFrame:
+        if daily_or_monthly == "daily":
+            name = data["name"]["name"]
+            timeline_data = data["timeline"]
+            timeline_df = pd.DataFrame(timeline_data)
+            timeline_df["name"] = name
+            timeline_df = timeline_df[["name", "datetime", "event_name", "event_details"]]
+        if daily_or_monthly == "monthly":
+            timeline_df = pd.DataFrame()
+            for daily_data in data:
+                name = daily_data["name"]["name"]
+                timeline_data = daily_data["timeline"]
+                daily_df = pd.DataFrame(timeline_data)
+                daily_df["name"] = name
+                daily_df = daily_df[["name", "datetime", "event_name", "event_details"]]
+                timeline_df = pd.concat([timeline_df, daily_df], ignore_index=True)
+        return timeline_df
 
 
 if __name__ == "__main__":
     parser = PiyologParser()
-    print(parser.parse("data/Piyolog_Hinano_20250203_14.txt"))
+    parsed_data = parser.parse("data/Piyolog_Hinano_202501.txt")
+    daily_or_monthly = parsed_data["daily_or_monthly"]
+    data = parsed_data["data"]
+    timeline_df = parser.get_timeline_df(data, daily_or_monthly)
+    print(timeline_df)
