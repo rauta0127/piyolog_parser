@@ -1,0 +1,35 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "piyolog_parser"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "piyolog_parser"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9, <3.13"
+pandas = "^2.2.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0"
+
+[project]
+name = "piyolog_parser"
+version = "0.1.0"
+description = ""
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.9, <3.13"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest"
+]
