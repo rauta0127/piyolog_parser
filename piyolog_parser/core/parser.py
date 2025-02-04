@@ -40,7 +40,7 @@ class PiyologParser:
             timeline_data = data["timeline"]
             timeline_df = pd.DataFrame(timeline_data)
             timeline_df["name"] = name
-            timeline_df = timeline_df[["name", "datetime", "event_name", "event_details"]]
+            timeline_df = timeline_df[["name", "datetime", "event_name", "event_details"] + list(set(timeline_df.columns) - {"name", "datetime", "event_name", "event_details"})]
         if daily_or_monthly == "monthly":
             timeline_df = pd.DataFrame()
             for daily_data in data:
@@ -48,7 +48,7 @@ class PiyologParser:
                 timeline_data = daily_data["timeline"]
                 daily_df = pd.DataFrame(timeline_data)
                 daily_df["name"] = name
-                daily_df = daily_df[["name", "datetime", "event_name", "event_details"]]
+                daily_df = daily_df[["name", "datetime", "event_name", "event_details"] + list(set(daily_df.columns) - {"name", "datetime", "event_name", "event_details"})]
                 timeline_df = pd.concat([timeline_df, daily_df], ignore_index=True)
         return timeline_df
 

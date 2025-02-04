@@ -1,6 +1,7 @@
 import re
 import pandas as pd
 from .parse_base import ParserBase
+from .parse_event import ParserEvent
 
 
 class ParserDaily(ParserBase):
@@ -80,7 +81,10 @@ class ParserDaily(ParserBase):
                 datetime = f"{date} {time}"
                 event_name = match.group(2)
                 event_details = match.group(3) if match.group(3) else ""
-                parsed_timeline.append({"datetime": datetime, "event_name": event_name, "event_details": event_details})
+                event = {"datetime": datetime, "event_name": event_name, "event_details": event_details}
+                parser_event = ParserEvent()
+                parsed_event = parser_event.parse(event)
+                parsed_timeline.append(parsed_event)
 
         return parsed_timeline
 
@@ -99,7 +103,7 @@ class ParserDaily(ParserBase):
         timeline_data = data["timeline"]
         timeline_df = pd.DataFrame(timeline_data)
         timeline_df["name"] = name
-        timeline_df = timeline_df[["name", "datetime", "event_name", "event_details"]]
+        timeline_df = timeline_df[["name", "datetime", "event_name", "event_details"] + list(set(timeline_df.columns) - {"name", "datetime", "event_name", "event_details"})]
         return timeline_df
 
 
