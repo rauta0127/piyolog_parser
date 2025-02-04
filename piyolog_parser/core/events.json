@@ -31,13 +31,13 @@
             "ふつう": {"name_en": "normal", "amount_int": 30, "amount_unit": "g"},
             "多め": {"name_en": "large", "amount_int": 50, "amount_unit": "g"}
         },
-        "hardness": {
+        "poo_hardness": {
             "下痢": {"name_en": "diarrhea"},
             "やわらかめ": {"name_en": "soft"},
             "ふつう": {"name_en": "normal"},
             "かため": {"name_en": "hard"}
         },
-        "color": {
+        "poo_color": {
             "無": {"name_en": "none"},
             "白": {"name_en": "white"},
             "黄": {"name_en": "yellow"},

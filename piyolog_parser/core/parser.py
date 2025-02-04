@@ -50,6 +50,21 @@ class PiyologParser:
                 daily_df["name"] = name
                 daily_df = daily_df[["name", "datetime", "event_name", "event_details"] + list(set(daily_df.columns) - {"name", "datetime", "event_name", "event_details"})]
                 timeline_df = pd.concat([timeline_df, daily_df], ignore_index=True)
+        timeline_df = timeline_df[
+            [
+                "name",
+                "datetime",
+                "event_name",
+                "event_name_en",
+                "group",
+                "amount",
+                "amount_int",
+                "amount_unit",
+                "poo_hardness",
+                "poo_color",
+                "event_details",
+            ]
+        ]
         return timeline_df
 
 

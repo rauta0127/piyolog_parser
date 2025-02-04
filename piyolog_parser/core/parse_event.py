@@ -4,7 +4,7 @@ import re
 
 class ParserEvent:
     def __init__(self):
-        with open("/Users/takuma.urata/Desktop/z/piyolog_parser/piyolog_parser/core/events.json") as f:
+        with open("piyolog_parser/core/events.json") as f:
             self.events = json.load(f)
 
     def parse(self, event: dict):
@@ -51,16 +51,16 @@ class ParserEvent:
                     if amount is None and attr in self.events["うんち"]["amount"]:
                         amount = attr
                         amount_int = int(self.events["うんち"]["amount"][amount]["amount_int"])
-                    elif hardness is None and attr in self.events["うんち"]["hardness"]:
+                    elif hardness is None and attr in self.events["うんち"]["poo_hardness"]:
                         hardness = attr
-                    elif color is None and attr in self.events["うんち"]["color"]:
+                    elif color is None and attr in self.events["うんち"]["poo_color"]:
                         color = attr
 
             event["event_name_en"] = event_name_en
             event["group"] = "peepoo"
             event["amount"] = amount
-            event["hardness"] = hardness
-            event["color"] = color
+            event["poo_hardness"] = hardness
+            event["poo_color"] = color
             event["amount_int"] = amount_int
             event["amount_unit"] = "g"
         if event_name_en == "pee":
