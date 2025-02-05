@@ -1,5 +1,5 @@
 import pandas as pd
-
+import json
 from .parse_base import ParserBase
 from .parse_daily import ParserDaily
 from .parse_monthly import ParserMonthly
@@ -34,7 +34,9 @@ class PiyologParser:
                     data.append(parser.parse(daily_block))
                 return {"status": "valid", "daily_or_monthly": "monthly", "data": data}
 
-    def get_timeline_df(self, data, daily_or_monthly) -> pd.DataFrame:
+    def get_timeline_df(self, parsed_data) -> pd.DataFrame:
+        daily_or_monthly = parsed_data["daily_or_monthly"]
+        data = parsed_data["data"]
         if daily_or_monthly == "daily":
             name = data["name"]["name"]
             timeline_data = data["timeline"]
@@ -70,8 +72,7 @@ class PiyologParser:
 
 if __name__ == "__main__":
     parser = PiyologParser()
-    parsed_data = parser.parse("data/Piyolog_Hinano_202501.txt")
-    daily_or_monthly = parsed_data["daily_or_monthly"]
-    data = parsed_data["data"]
-    timeline_df = parser.get_timeline_df(data, daily_or_monthly)
-    print(timeline_df)
+    parsed_json = parser.parse("Piyolog_sample_20250204.txt")
+    print(json.dumps(parsed_json, indent=4, ensure_ascii=False))
+    parsed_df = parser.get_timeline_df(parsed_json)
+    print(parsed_df.to_markdown(index=False))
