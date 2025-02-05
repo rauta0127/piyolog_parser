@@ -105,5 +105,10 @@ print(parsed_df)
 3   ぴよこ  2025/2/4 07:30        うんち           poo  peepoo      多め        50.0           g          ふつう        NaN  (多め/ふつう) 漏れた
 ```
 
+## ⚠️ Disclaimer
+This project, `piyolog_parser`, is an **independent open-source project** and is **not affiliated with, endorsed by, or associated with Piyolog or its developers**.  
+It simply provides a tool to **structure Piyolog log text files into JSON/Pandas DataFrame format**.
+
+
 ### Reference
 - [ぴよログ](https://www.piyolog.com/)
