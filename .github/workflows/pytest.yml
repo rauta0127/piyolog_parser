@@ -1,0 +1,31 @@
+name: Run Pytest on Main Branch Update
+
+on:
+  push:
+    branches:
+      - main  # `main` ブランチが更新されたときに実行
+  pull_request:
+    branches:
+      - main  # `main` ブランチへの PR 作成/更新時にも実行
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4  # リポジトリをチェックアウト
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"  # Python のバージョンを指定
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install  # `pyproject.toml` に基づいて依存関係をインストール
+
+      - name: Run tests with pytest
+        run: poetry run pytest --maxfail=5 --disable-warnings  # Pytest を実行
