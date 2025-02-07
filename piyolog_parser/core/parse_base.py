@@ -39,6 +39,5 @@ class ParserBase:
 
 if __name__ == "__main__":
     parser = ParserBase()
-    is_valid, message = parser.validate_piyolog_file("data/invalid.txt")
+    is_valid, message = parser.validate_piyolog_file("tests/data/valid/monthly/valid_monthly.txt")
     print(is_valid, message)
-    print(parser.check_daily_or_monthly("data/invalid.txt"))

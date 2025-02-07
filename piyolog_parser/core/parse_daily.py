@@ -1,5 +1,7 @@
 import re
 import pandas as pd
+from datetime import datetime
+import warnings
 from .parse_base import ParserBase
 from .parse_event import ParserEvent
 
@@ -11,7 +13,7 @@ class ParserDaily(ParserBase):
     def parse_block(self, lines: list) -> dict:
         blocks = {}
         block_title_idx = 0
-        block_name_idx = 0
+        block_name_idx = 1
         block_timeline_idx_list = []
         block_stats_idx_list = []
         block_diary_idx_list = []
@@ -48,10 +50,17 @@ class ParserDaily(ParserBase):
         match = title_pattern.match(title_block)
 
         if match:
-            date = match.group(1)
+            date_str = match.group(1)
             weekday = match.group(2)
-            return {"date": date, "weekday": weekday}
-        return {"date": date, "weekday": weekday}
+
+            # 日付の妥当性チェック
+            try:
+                datetime.strptime(date_str, "%Y/%m/%d")
+            except ValueError:
+                raise ValueError(f"Invalid date: {date_str}")
+
+            return {"date": date_str, "weekday": weekday}
+        raise ValueError(f"Invalid title block: {title_block}")
 
     def parse_name_block(self, name_block: str) -> dict:
         """
@@ -63,8 +72,10 @@ class ParserDaily(ParserBase):
         if match:
             name = match.group(1).strip()
             age = match.group(2)
+            if name == "":
+                warnings.warn(f"Name is blank: {name_block}", UserWarning)
             return {"name": name, "age": age}
-        return {"name": name, "age": age}
+        raise ValueError(f"Invalid name block: {name_block}")
 
     def parse_timeline(self, timeline: list, parsed_title_block: dict) -> list:
         """
@@ -78,25 +89,59 @@ class ParserDaily(ParserBase):
             match = time_pattern.match(entry)
             if match:
                 time = match.group(1)
-                datetime = f"{date} {time}"
+                datetime_str = f"{date} {time}"
+                try:
+                    datetime.strptime(datetime_str, "%Y/%m/%d %H:%M")
+                except ValueError:
+                    raise ValueError(f"Invalid datetime: {datetime_str}")
                 event_name = match.group(2)
+                if event_name == "":
+                    warnings.warn(f"Event Name is blank: {entry}", UserWarning)
                 event_details = match.group(3) if match.group(3) else ""
-                event = {"datetime": datetime, "event_name": event_name, "event_details": event_details}
+                event = {"datetime": datetime_str, "event_name": event_name, "event_details": event_details}
                 parser_event = ParserEvent()
                 parsed_event = parser_event.parse(event)
                 parsed_timeline.append(parsed_event)
 
+        if len(parsed_timeline) == 0:
+            raise ValueError("No valid timeline entries")
         return parsed_timeline
 
     def parse(self, lines: list):
         """
         parse daily lines
         """
-        blocks = self.parse_block(lines)
-        title = self.parse_title_block(blocks["title"])
-        name = self.parse_name_block(blocks["name"])
-        timeline = self.parse_timeline(blocks["timeline"], title)
-        return {"title": title, "name": name, "timeline": timeline}
+        if len(lines) == 0:
+            return {"status": "invalid", "message": "empty file"}
+        if len(lines) < 4:
+            return {"status": "invalid", "message": "invalid as piyolog format (Too short)"}
+
+        warnings_list = []  # 警告を収集するリスト
+        try:
+            blocks = self.parse_block(lines)
+
+            # 警告をキャッチするコンテキスト
+            with warnings.catch_warnings(record=True) as caught_warnings:
+                warnings.simplefilter("always")  # すべての警告をキャッチ
+
+                title = self.parse_title_block(blocks["title"])
+                name = self.parse_name_block(blocks["name"])
+                timeline = self.parse_timeline(blocks["timeline"], title)
+
+                # キャッチした警告をリストに追加
+                for w in caught_warnings:
+                    warnings_list.append(str(w.message))
+
+            return {
+                "status": "valid",
+                "title": title,
+                "name": name,
+                "timeline": timeline,
+                "warnings": warnings_list,  # 警告があればリストに含める
+            }
+
+        except ValueError as e:
+            return {"status": "invalid", "message": str(e)}
 
     def convert_timeline_to_dataframe(self, data: dict) -> pd.DataFrame:
         name = data["name"]["name"]
@@ -108,10 +153,11 @@ class ParserDaily(ParserBase):
 
 
 if __name__ == "__main__":
-    with open("data/Piyolog_Hinano_20250203_14.txt") as f:
+    with open("tests/data/invalid/daily/missing_time.txt") as f:
         lines = f.readlines()
     parser = ParserDaily()
     parsed_data = parser.parse(lines)
     print(parsed_data)
-    timeline_df = parser.convert_timeline_to_dataframe(parsed_data)
-    print(timeline_df)
+    if parsed_data["status"] == "valid":
+        timeline_df = parser.convert_timeline_to_dataframe(parsed_data)
+        print(timeline_df)

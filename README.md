@@ -4,10 +4,10 @@
 It supports both **daily and monthly logs**, converting them into **JSON** or **Pandas DataFrame** formats for easy analysis and visualization.
 
 ## 🍼 Install
+🚧 Currently preparing for PyPI registration...
 ```sh
 pip install piyolog_parser
 ```
-🚧 Currently preparing for PyPI registration.
 
 ## 🚀 Features
 - **Parse Piyolog text logs** into structured data
@@ -16,14 +16,27 @@ pip install piyolog_parser
 - Helps with **tracking baby activities (sleep, feeding, diaper changes, etc.)**
 - Can be used for **data analysis and visualization**
 
+### Sample Input
+This is sample input text file which can be export from piyolog.
+```
+【ぴよログ】2025/2/4(火)
+ぴよこ (0歳8か月15日)
+
+06:10 起きる (8時間20分)
+06:40 ミルク 210ml
+07:30 おしっこ
+07:30 うんち (多め/ふつう) 漏れた
+```
+
 ### to JSON
 ```python
+import json
 from piyolog_parser.parser import PiyologParser
 
 parser = PiyologParser()
-piyolog_textfile = "Piyolog_sample_20250203.txt"
+piyolog_textfile = "sample_daily.txt"
 parsed_json = parser.parse(piyolog_textfile)
-print(parsed_json)
+print(json.dumps(parsed_json, indent=4, ensure_ascii=False))
 ```
 
 #### Sample Output
@@ -90,7 +103,7 @@ print(parsed_json)
 from piyolog_parser.parser import PiyologParser
 
 parser = PiyologParser()
-piyolog_textfile = "Piyolog_sample_20250203.txt"
+piyolog_textfile = "sample_daily.txt"
 parsed_json = parser.parse(piyolog_textfile)
 parsed_df = parser.get_timeline_df(parsed_json)
 print(parsed_df)
@@ -105,7 +118,7 @@ print(parsed_df)
 3   ぴよこ  2025/2/4 07:30        うんち           poo  peepoo      多め        50.0           g          ふつう        NaN  (多め/ふつう) 漏れた
 ```
 
-## ⚠️ Disclaimer
+### ⚠️ Disclaimer
 This project, `piyolog_parser`, is an **independent open-source project** and is **not affiliated with, endorsed by, or associated with Piyolog or its developers**.  
 It simply provides a tool to **structure Piyolog log text files into JSON/Pandas DataFrame format**.
 

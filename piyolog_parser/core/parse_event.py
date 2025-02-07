@@ -1,35 +1,72 @@
 import json
 import re
+from pathlib import Path
+import warnings
 
 
 class ParserEvent:
     def __init__(self):
-        with open("piyolog_parser/core/events.json") as f:
+        base_path = Path(__file__).resolve().parent.parent
+        events_path = base_path / "data/events.json"
+        with open(events_path) as f:
             self.events = json.load(f)
 
     def parse(self, event: dict):
-        event_name = event["event_name"]
-        event_group = self.events.get(event_name, {}).get("group", None)
+        """
+        Parse event data and collect warnings.
+        """
+        warnings_list = []
 
-        if event_group == "drink":
-            return self.parse_drink(event)
-        if event_group == "peepoo":
-            return self.parse_peepoo(event)
-        if event_group == "sleep":
-            return self.parse_sleep(event)
-        if event_group == "other":
-            return self.parse_sleep(event)
-        return event
+        try:
+            event_name = event["event_name"]
+            event_group = self.events.get(event_name, {}).get("group", None)
+
+            with warnings.catch_warnings(record=True) as caught_warnings:
+                warnings.simplefilter("always")
+
+                if event_group == "drink":
+                    parsed_event = self.parse_drink(event)
+                elif event_group == "peepoo":
+                    parsed_event = self.parse_peepoo(event)
+                elif event_group == "sleep":
+                    parsed_event = self.parse_sleep(event)
+                elif event_group == "eat":
+                    parsed_event = self.parse_eat(event)
+                elif event_group == "other":
+                    parsed_event = self.parse_other(event)
+                else:
+                    parsed_event = event
+
+                # 警告をリストに追加
+                for w in caught_warnings:
+                    warnings_list.append(str(w.message))
+
+            parsed_event["warnings"] = warnings_list  # 警告をイベントに追加
+            return parsed_event
+
+        except Exception as e:
+            return {"status": "invalid", "message": str(e)}
 
     def parse_drink(self, event: dict):
         event_name = event["event_name"]
         event_details = event["event_details"]
         event_name_en = self.events.get(event_name, {}).get("name_en", None)
-        match = re.search(r"(\d+)ml", event_details)
-        amount_int = int(match.group(1)) if match else 0
+        match = re.search(r"(-?\d+)ml", event_details)
+        amount_int = None
+        if match:
+            try:
+                amount_int = int(match.group(1))
+                if amount_int < 0:
+                    amount_int = None
+                    warnings.warn(f"amount may be invalid: {event_details}", UserWarning)
+            except ValueError:
+                warnings.warn(f"amount may be invalid: {event_details}", UserWarning)
+
         event["event_name_en"] = event_name_en
         event["group"] = "drink"
-        event["amount"] = f"{amount_int}ml"
+        event["amount"] = None
+        if amount_int:
+            event["amount"] = f"{amount_int}ml"
         event["amount_int"] = amount_int
         event["amount_unit"] = "ml"
         return event
@@ -45,7 +82,6 @@ class ParserEvent:
             if match:
                 attributes = match.group(1).split("/")
                 attributes = [attr.replace("(", "") for attr in attributes]
-                # free_text = match.group(2).strip() if match.group(2) else ""
 
                 for attr in attributes:
                     if amount is None and attr in self.events["うんち"]["amount"]:
@@ -63,7 +99,7 @@ class ParserEvent:
             event["poo_color"] = color
             event["amount_int"] = amount_int
             event["amount_unit"] = "g"
-        if event_name_en == "pee":
+        elif event_name_en == "pee":
             event["event_name_en"] = event_name_en
             event["group"] = "peepoo"
         return event
@@ -77,7 +113,14 @@ class ParserEvent:
             match = duration_pattern.match(event_details)
             if match:
                 hours = int(match.group(1)) if match.group(1) else 0
+                if hours < 0 or hours > 24:
+                    hours = 0
+                    warnings.warn(f"hours may be invalid: {event_details}", UserWarning)
                 minutes = int(match.group(2)) if match.group(2) else 0
+                if minutes < 0 or minutes > 59:
+                    minutes = 0
+                    warnings.warn(f"minutes may be invalid: {event_details}", UserWarning)
+
                 amount = f"{hours}時間{minutes}分"
                 amount_int = int(hours * 60 + minutes)
                 event["amount"] = amount
@@ -88,9 +131,15 @@ class ParserEvent:
         event["group"] = "sleep"
         return event
 
+    def parse_eat(self, event: dict):
+        event_name = event["event_name"]
+        event_name_en = self.events.get(event_name, {}).get("name_en", None)
+        event["event_name_en"] = event_name_en
+        event["group"] = "eat"
+        return event
+
     def parse_other(self, event: dict):
         event_name = event["event_name"]
-        # event_details = event["event_details"]
         event_name_en = self.events.get(event_name, {}).get("name_en", None)
         event["event_name_en"] = event_name_en
         event["group"] = "other"
@@ -99,11 +148,13 @@ class ParserEvent:
 
 if __name__ == "__main__":
     parser = ParserEvent()
-    # event = {"datetime": "2025/2/3 08:00", "event_name": "うんち", "event_details": ""}
-    # print(parser.parse_peepoo(event))
 
-    event = {"datetime": "2025/2/3 08:00", "event_name": "搾母乳", "event_details": "120ml"}
-    print(parser.parse(event))
+    test_events = [
+        {"datetime": "2025/2/3 08:00", "event_name": "搾母乳", "event_details": "120ml"},
+        {"datetime": "2025/2/3 08:00", "event_name": "うんち", "event_details": "(ふつう/ふつう)"},
+        {"datetime": "2025/2/3 08:00", "event_name": "ミルク", "event_details": "210l"},
+        {"datetime": "2025/2/3 08:00", "event_name": "ミルク", "event_details": "-210ml"},
+    ]
 
-    event = {"datetime": "2025/2/3 08:00", "event_name": "うんち", "event_details": "(ふつう/ふつう)"}
-    print(parser.parse(event))
+    for event in test_events:
+        print(json.dumps(parser.parse(event), indent=4, ensure_ascii=False))
