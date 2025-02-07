@@ -20,8 +20,6 @@ pandas = "^2.2.3"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"
 
-include = ["piyolog_parser/data/events.json"]
-
 # # スクリプト（オプション）
 # [tool.poetry.scripts]
 # piyolog-parser = "piyolog_parser.parser:main"
