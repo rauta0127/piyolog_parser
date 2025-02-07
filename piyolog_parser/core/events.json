@@ -1,0 +1,73 @@
+{
+    "母乳": {
+        "group": "drink",
+        "name_en": "breast_milk",
+        "amount_unit": "ml"
+    },
+    "ミルク": {
+        "group": "drink",
+        "name_en": "milk",
+        "amount_unit": "ml"
+    },
+    "寝る": {
+        "group": "sleep",
+        "name_en": "sleep"
+    },
+    "起きる": {
+        "group": "sleep",
+        "name_en": "wakeup",
+        "amount_unit": "min"
+    },
+    "おしっこ": {
+        "group": "peepoo",
+        "name_en": "pee"
+    },
+    "うんち": {
+        "group": "peepoo",
+        "name_en": "poo",
+        "amount": {
+            "ちょこっと": {"name_en": "tiny", "amount_int": 5, "amount_unit": "g"},
+            "少なめ": {"name_en": "small", "amount_int": 10, "amount_unit": "g"},
+            "ふつう": {"name_en": "normal", "amount_int": 30, "amount_unit": "g"},
+            "多め": {"name_en": "large", "amount_int": 50, "amount_unit": "g"}
+        },
+        "poo_hardness": {
+            "下痢": {"name_en": "diarrhea"},
+            "やわらかめ": {"name_en": "soft"},
+            "ふつう": {"name_en": "normal"},
+            "かため": {"name_en": "hard"}
+        },
+        "poo_color": {
+            "無": {"name_en": "none"},
+            "白色": {"name_en": "white"},
+            "黄色": {"name_en": "yellow"},
+            "橙色": {"name_en": "orange"},
+            "茶色": {"name_en": "brown"},
+            "緑色": {"name_en": "green"},
+            "赤色": {"name_en": "red"},
+            "黒色": {"name_en": "black"}
+        }
+    },
+    "体温": {
+        "group": "other",
+        "name_en": "temperature"
+    },
+    "搾母乳": {
+        "group": "drink",
+        "name_en": "pump_breast_milk",
+        "amount_unit": "ml"
+    },
+    "のみもの": {
+        "group": "drink",
+        "name_en": "drink",
+        "amount_unit": "ml"
+    },
+    "お風呂": {
+        "group": "other",
+        "name_en": "bath"
+    },
+    "離乳食": {
+        "group": "eat",
+        "name_en": "baby_food"
+    }
+}

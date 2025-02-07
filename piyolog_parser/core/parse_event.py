@@ -7,7 +7,7 @@ import warnings
 class ParserEvent:
     def __init__(self):
         base_path = Path(__file__).resolve().parent.parent
-        events_path = base_path / "data/events.json"
+        events_path = base_path / "core/events.json"
         with open(events_path) as f:
             self.events = json.load(f)
 
