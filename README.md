@@ -4,10 +4,10 @@
 It supports both **daily and monthly logs**, converting them into **JSON** or **Pandas DataFrame** formats for easy analysis and visualization.
 
 ## 🍼 Install
-🚧 Currently preparing for PyPI registration...
 ```sh
-pip install piyolog_parser
+pip install git+https://github.com/rauta0127/piyolog_parser.git
 ```
+🚧 Currently preparing for PyPI registration...
 
 ## 🚀 Features
 - **Parse Piyolog text logs** into structured data
